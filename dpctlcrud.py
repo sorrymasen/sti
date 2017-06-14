@@ -63,6 +63,25 @@ def delete_dp(dp_id):
     output, err = p.communicate()
     return output
 
+@app.route('/todo/api/v1.0/mod/<int:dp_id>', methods=['PUT'])
+def update_dp(dp_id):
+    dp = [dp for dp in dps if dp['id'] == dp_id]
+    if len(dp) == 0:
+        abort(404)
+    if not request.json:
+        abort(400)
+    if 'dpname' in request.json and type(request.json['dpname']) != unicode:
+        abort(400)
+    dpmodname = str(dp[0]['dpname'])
+    concat = "ovs-dpctl del-dp %s" % (dpmodname)
+    subprocess.call(concat, shell = True)
+    dp[0]['dpname'] = request.json.get('dpname', dp[0]['dpname'])
+
+    dpnewname = str(request.json['dpname'])
+    concat2 = "ovs-dpctl add-dp %s" % (dpnewname)
+    subprocess.call(concat2, shell = True)
+
+    return jsonify({'dp': dp[0]})
 
 if __name__ == '__main__':
     app.run(debug=True)
