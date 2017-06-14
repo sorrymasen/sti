@@ -50,6 +50,19 @@ def create_dp():
     subprocess.call(concat, shell = True)
     return jsonify({'dp': dp}), 201
 
+@app.route('/todo/api/v1.0/delete/<int:dp_id>', methods=['DELETE'])
+def delete_dp(dp_id):
+    dp = [dp for dp in dps if dp['id'] == dp_id]
+    if len(dp) == 0:
+        abort(404)
+    dpdeletename = str(dp[0]['dpname'])
+    dps.remove(dp[0])
+    concat = "ovs-dpctl del-dp %s" % (dpdeletename)
+    subprocess.call(concat, shell = True)
+    p = subprocess.Popen(["sudo","ovs-dpctl","dump-dps"], stdout=subprocess.PIPE)
+    output, err = p.communicate()
+    return output
+
 
 if __name__ == '__main__':
     app.run(debug=True)
