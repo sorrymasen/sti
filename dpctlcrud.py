@@ -36,6 +36,20 @@ def get_dp(dp_id):
         abort(404)
     return jsonify({'dp': dp[0]})
 
+@app.route('/todo/api/v1.0/dp', methods=['POST'])
+def create_dp():
+    if not request.json or not 'dpname' in request.json:
+        abort(400)
+    dp = {
+        'id': dps[-1]['id'] + 1,
+        'dpname': request.json['dpname']
+    }
+    dps.append(dp)
+    dpname = str(request.json['dpname'])
+    concat = "ovs-dpctl add-dp %s" % (dpname)
+    subprocess.call(concat, shell = True)
+    return jsonify({'dp': dp}), 201
+
 
 if __name__ == '__main__':
     app.run(debug=True)
