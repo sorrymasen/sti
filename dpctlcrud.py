@@ -36,7 +36,7 @@ def get_dp(dp_id):
         abort(404)
     return jsonify({'dp': dp[0]})
 
-@app.route('/todo/api/v1.0/dp', methods=['POST'])
+@app.route('/todo/api/v1.0/create', methods=['POST'])
 def create_dp():
     if not request.json or not 'dpname' in request.json:
         abort(400)
